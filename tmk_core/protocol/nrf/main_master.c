@@ -125,9 +125,7 @@ void main_tasks(void* p_context) {
 
 #endif
 
-#ifdef RGBLIGHT_SPLIT
   eeprom_update();
-#endif
 }
 
 void send_keyboard(report_keyboard_t *report) {
