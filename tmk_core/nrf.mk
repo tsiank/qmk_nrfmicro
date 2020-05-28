@@ -901,7 +901,10 @@ dfu-util: $(BUILD_DIR)/$(TARGET).bin cpfirmware sizeafter
 
 bin: $(BUILD_DIR)/$(TARGET).bin sizeafter
 	$(COPY) $(BUILD_DIR)/$(TARGET).bin $(TARGET).bin;
-	
+
+	python ./util/uf2conv.py $(BUILD_DIR)/$(TARGET).hex -c -f 0xADA52840 -o $(TARGET).uf2
+	mv $(TARGET).uf2 $(BUILD_DIR)
+
 GREP ?= grep
 NRFUTIL ?= nrfutil
 
