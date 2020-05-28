@@ -88,7 +88,9 @@ void console_task(void);
 
 #ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
+#ifdef RGBLIGHT_SPLIT
 rgblight_syncinfo_t rgblight_sync;
+#endif
 #endif
 
 uint32_t ble_nus_send_bytes_to_slave(uint8_t* buf, uint16_t len);
@@ -113,14 +115,19 @@ void main_tasks(void* p_context) {
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_ANIMATIONS)
   rgblight_task();
 
+#ifdef RGBLIGHT_SPLIT
   if (rgblight_get_change_flags()) {
     rgblight_get_syncinfo(&rgblight_sync);
     ble_nus_send_bytes_to_slave((uint8_t*)&rgblight_sync, sizeof(rgblight_sync));
     rgblight_clear_change_flags();
   }
+#endif
 
 #endif
+
+#ifdef RGBLIGHT_SPLIT
   eeprom_update();
+#endif
 }
 
 void send_keyboard(report_keyboard_t *report) {
