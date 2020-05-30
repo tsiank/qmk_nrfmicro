@@ -44,6 +44,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef MIDI_ENABLE
 #include "qmk_midi.h"
 #endif
+#ifdef RGB_MATRIX_ENABLE
+#include "rgb_matrix.h"
+#endif
 #ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
 #endif
@@ -52,6 +55,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const uint8_t MAINTASK_INTERVAL=17;
 
+#ifndef KEYBOARD_SCAN_INTERVAL
+#    define KEYBOARD_SCAN_INTERVAL 4
+#endif
 /* -------------------------
  *   TMK host driver defs
  * -------------------------
@@ -112,6 +118,11 @@ void main_tasks(void* p_context) {
 #ifdef RAW_HID_ENABLE
   raw_hid_task();
 #endif
+
+#ifdef RGB_MATRIX_ENABLE
+rgb_matrix_task();
+#endif
+
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_ANIMATIONS)
   rgblight_task();
 

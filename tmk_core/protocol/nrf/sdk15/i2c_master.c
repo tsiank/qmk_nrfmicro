@@ -66,6 +66,9 @@
 
 static const nrfx_twim_t m_twim_master = NRFX_TWIM_INSTANCE(0);
 static int twim_complete = 0;
+static volatile bool     twim_enable   = false;
+static uint8_t twi_transfer_buffer[10];
+
 void twim_evt_handler(nrfx_twim_evt_t const *p_event, void *p_context) {
   NRF_LOG_INFO("TWIM Event:%d", p_event->type);
   twim_complete = p_event->type + 1;
@@ -89,8 +92,11 @@ void i2c_uninit(void) {
   nrfx_twim_uninit(&m_twim_master);
 }
 
-uint8_t i2c_transmit(uint8_t address, uint8_t* data, uint16_t length)
+uint8_t i2c_transmit(uint8_t address, uint8_t* data, uint16_t length, uint16_t timeout)
 {
+    if (!twim_enable) {
+        return 0;
+    }
   nrfx_err_t res;
   twim_complete = 0;
   res = nrfx_twim_tx(&m_twim_master, address, data, length, false);
@@ -104,6 +110,9 @@ uint8_t i2c_transmit(uint8_t address, uint8_t* data, uint16_t length)
   }
   if(cnt == 1000) NRF_LOG_INFO("TX TIMEOUT");
   return twim_complete == 1 ? 0 : 1;
+    if (twim_complete != 1) {
+        NRF_LOG_INFO("twim_uncomplete:%d %d %d", length, data[0], data[1]);
+    }
 }
 
 uint8_t i2c_receive(uint8_t address, uint8_t* data, uint16_t length)
@@ -126,7 +135,7 @@ uint8_t i2c_receive(uint8_t address, uint8_t* data, uint16_t length)
 uint8_t i2c_readReg(uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t length, uint16_t timeout) {
 //  nrfx_twi_tx(&m_twi_master, devaddr, &regaddr, 1, true);
 //  return nrfx_twi_rx(&m_twi_master, devaddr, data, length);
-  i2c_transmit(devaddr, &regaddr, 1);
+  i2c_transmit(devaddr, &regaddr, 1,0);
   return i2c_receive(devaddr, data, length);
 }
 
@@ -134,6 +143,40 @@ uint8_t i2c_writeReg(uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t l
   static uint8_t buffer[256];
   buffer[0] = regaddr;
   memcpy(&buffer[1], data, length);
-  return i2c_transmit(devaddr, buffer, length+1);
+  return i2c_transmit(devaddr, buffer, length+1,0);
   return 0;
+}
+
+static void i2c_write_register(uint8_t addr, uint8_t reg, uint8_t data) {
+    twi_transfer_buffer[0] = reg;
+    twi_transfer_buffer[1] = data;
+    i2c_transmit(addr << 1, twi_transfer_buffer, 2, 0);
+}
+
+void i2c_start(void) {
+    nrfx_twim_enable(&m_twim_master);
+    twim_enable = true;
+#ifdef IS31FL3737
+    i2c_write_register(DRIVER_ADDR_1, 0xFE, 0xC5);
+    i2c_write_register(DRIVER_ADDR_1, 0xFD, 0x03);
+    i2c_write_register(DRIVER_ADDR_1, 0x00, 0x01);
+    
+    i2c_write_register(DRIVER_ADDR_2, 0xFE, 0xC5);
+    i2c_write_register(DRIVER_ADDR_2, 0xFD, 0x03);
+    i2c_write_register(DRIVER_ADDR_2, 0x00, 0x01);
+#endif
+}
+
+void i2c_stop(void) {
+#ifdef IS31FL3737
+    i2c_write_register(DRIVER_ADDR_1, 0xFE, 0xC5);
+    i2c_write_register(DRIVER_ADDR_1, 0xFD, 0x03);
+    i2c_write_register(DRIVER_ADDR_1, 0x00, 0x00);
+    
+    i2c_write_register(DRIVER_ADDR_2, 0xFE, 0xC5);
+    i2c_write_register(DRIVER_ADDR_2, 0xFD, 0x03);
+    i2c_write_register(DRIVER_ADDR_2, 0x00, 0x00);
+#endif
+    twim_enable = false;
+    nrfx_twim_disable(&m_twim_master);
 }

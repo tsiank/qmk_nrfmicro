@@ -76,8 +76,6 @@ enum RGBLIGHT_EFFECT_MODE {
     RGBLIGHT_MODE_last
 };
 
-#ifndef RGBLIGHT_H_DUMMY_DEFINE
-
 #    define RGBLIGHT_MODES (RGBLIGHT_MODE_last - 1)
 
 // sample: #define RGBLIGHT_EFFECT_BREATHE_CENTER   1.85
@@ -310,5 +308,4 @@ void rgblight_effect_alternating(animation_status_t *anim);
 
 #    endif
 
-#endif  // #ifndef RGBLIGHT_H_DUMMY_DEFINE
 #endif  // RGBLIGHT_H

@@ -233,7 +233,7 @@ bool process_record_quantum(keyrecord_t *record) {
       process_clicky(keycode, record) &&
   #endif //AUDIO_CLICKY
     process_record_kb(keycode, record) &&
-  #if defined(RGB_MATRIX_ENABLE) && defined(RGB_MATRIX_KEYPRESSES)
+  #if defined(RGB_MATRIX_ENABLE)
     process_rgb_matrix(keycode, record) &&
   #endif
   #if defined(MIDI_ENABLE) && defined(MIDI_ADVANCED)
@@ -313,209 +313,360 @@ bool process_record_quantum(keyrecord_t *record) {
     }
     return false;
   #endif
-  #if defined(RGBLIGHT_ENABLE) || defined(RGB_MATRIX_ENABLE)
-  case RGB_TOG:
-    // Split keyboards need to trigger on key-up for edge-case issue
-    #ifndef SPLIT_KEYBOARD
-    if (record->event.pressed) {
-    #else
-    if (!record->event.pressed) {
-    #endif
-      rgblight_toggle();
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_MODE_FORWARD:
-    if (record->event.pressed) {
-      uint8_t shifted = get_mods() & (MOD_BIT(KC_LSHIFT)|MOD_BIT(KC_RSHIFT));
-      if(shifted) {
-        rgblight_step_reverse();
-      }
-      else {
-        rgblight_step();
-      }
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_MODE_REVERSE:
-    if (record->event.pressed) {
-      uint8_t shifted = get_mods() & (MOD_BIT(KC_LSHIFT)|MOD_BIT(KC_RSHIFT));
-      if(shifted) {
-        rgblight_step();
-      }
-      else {
-        rgblight_step_reverse();
-      }
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_HUI:
-    // Split keyboards need to trigger on key-up for edge-case issue
-    #ifndef SPLIT_KEYBOARD
-    if (record->event.pressed) {
-    #else
-    if (!record->event.pressed) {
-    #endif
-      rgblight_increase_hue();
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_HUD:
-    // Split keyboards need to trigger on key-up for edge-case issue
-    #ifndef SPLIT_KEYBOARD
-    if (record->event.pressed) {
-    #else
-    if (!record->event.pressed) {
-    #endif
-      rgblight_decrease_hue();
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_SAI:
-    // Split keyboards need to trigger on key-up for edge-case issue
-    #ifndef SPLIT_KEYBOARD
-    if (record->event.pressed) {
-    #else
-    if (!record->event.pressed) {
-    #endif
-      rgblight_increase_sat();
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_SAD:
-    // Split keyboards need to trigger on key-up for edge-case issue
-    #ifndef SPLIT_KEYBOARD
-    if (record->event.pressed) {
-    #else
-    if (!record->event.pressed) {
-    #endif
-      rgblight_decrease_sat();
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_VAI:
-    // Split keyboards need to trigger on key-up for edge-case issue
-    #ifndef SPLIT_KEYBOARD
-    if (record->event.pressed) {
-    #else
-    if (!record->event.pressed) {
-    #endif
-      rgblight_increase_val();
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_VAD:
-    // Split keyboards need to trigger on key-up for edge-case issue
-    #ifndef SPLIT_KEYBOARD
-    if (record->event.pressed) {
-    #else
-    if (!record->event.pressed) {
-    #endif
-      rgblight_decrease_val();
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_SPI:
-    if (record->event.pressed) {
-      rgblight_increase_speed();
-    }
-    return false;
-  case RGB_SPD:
-    if (record->event.pressed) {
-      rgblight_decrease_speed();
-    }
-    return false;
-  case RGB_MODE_PLAIN:
-    if (record->event.pressed) {
-      rgblight_mode(1);
-      #ifdef SPLIT_KEYBOARD
-          RGB_DIRTY = true;
-      #endif
-    }
-    return false;
-  case RGB_MODE_BREATHE:
-    if (record->event.pressed) {
-      if ((2 <= rgblight_get_mode()) && (rgblight_get_mode() < 5)) {
-        rgblight_step();
-      } else {
-        rgblight_mode(2);
-      }
-    }
-    return false;
-  case RGB_MODE_RAINBOW:
-    if (record->event.pressed) {
-      if ((6 <= rgblight_get_mode()) && (rgblight_get_mode() < 8)) {
-        rgblight_step();
-      } else {
-        rgblight_mode(6);
-      }
-    }
-    return false;
-  case RGB_MODE_SWIRL:
-    if (record->event.pressed) {
-      if ((9 <= rgblight_get_mode()) && (rgblight_get_mode() < 14)) {
-        rgblight_step();
-      } else {
-        rgblight_mode(9);
-      }
-    }
-    return false;
-  case RGB_MODE_SNAKE:
-    if (record->event.pressed) {
-      if ((15 <= rgblight_get_mode()) && (rgblight_get_mode() < 20)) {
-        rgblight_step();
-      } else {
-        rgblight_mode(15);
-      }
-    }
-    return false;
-  case RGB_MODE_KNIGHT:
-    if (record->event.pressed) {
-      if ((21 <= rgblight_get_mode()) && (rgblight_get_mode() < 23)) {
-        rgblight_step();
-      } else {
-        rgblight_mode(21);
-      }
-    }
-    return false;
-  case RGB_MODE_XMAS:
-    if (record->event.pressed) {
-      rgblight_mode(24);
-    }
-    return false;
-  case RGB_MODE_GRADIENT:
-    if (record->event.pressed) {
-      if ((25 <= rgblight_get_mode()) && (rgblight_get_mode() < 34)) {
-        rgblight_step();
-      } else {
-        rgblight_mode(25);
-      }
-    }
-    return false;
-  case RGB_MODE_RGBTEST:
-    if (record->event.pressed) {
-      rgblight_mode(35);
-    }
-    return false;
-  #endif // defined(RGBLIGHT_ENABLE) || defined(RGB_MATRIX_ENABLE)
+#if defined(RGBLIGHT_ENABLE) || defined(RGB_MATRIX_ENABLE)
+        case RGB_TOG:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_toggle();
+#    endif
+            }
+            return false;
+        case RGBM_TOG:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_toggle();
+#    endif
+            }
+            return false;
+        case RGB_MODE_FORWARD:
+            if (record->event.pressed) {
+                uint8_t shifted = get_mods() & (MOD_MASK_SHIFT);
+                if (shifted) {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                    rgblight_step_reverse();
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                    rgb_matrix_step_reverse();
+#    endif
+                } else {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                    rgblight_step();
+#    endif
+                }
+            }
+            return false;
+        case RGBM_MODE_FORWARD:
+            if (record->event.pressed) {
+                uint8_t shifted = get_mods() & (MOD_MASK_SHIFT);
+                if (shifted) {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                    rgblight_step_reverse();
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                    rgb_matrix_step_reverse();
+#    endif
+                } else {
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                    rgb_matrix_step();
+#    endif
+                }
+            }
+            return false;
+        case RGB_MODE_REVERSE:
+            if (record->event.pressed) {
+                uint8_t shifted = get_mods() & (MOD_MASK_SHIFT);
+                if (shifted) {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                    rgblight_step();
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                    rgb_matrix_step();
+#    endif
+                } else {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                    rgblight_step_reverse();
+#    endif
+                }
+            }
+            return false;
+        case RGBM_MODE_REVERSE:
+            if (record->event.pressed) {
+                uint8_t shifted = get_mods() & (MOD_MASK_SHIFT);
+                if (shifted) {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                    rgblight_step();
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                    rgb_matrix_step();
+#    endif
+                } else {
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                    rgb_matrix_step_reverse();
+#    endif
+                }
+            }
+            return false;
+        case RGB_HUI:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_increase_hue();
+#    endif
+            }
+            return false;
+        case RGBM_HUI:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_increase_hue();
+#    endif
+            }
+            return false;
+        case RGB_HUD:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_decrease_hue();
+#    endif
+            }
+            return false;
+        case RGBM_HUD:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_decrease_hue();
+#    endif
+            }
+            return false;
+        case RGB_SAI:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_increase_sat();
+#    endif
+            }
+            return false;
+        case RGBM_SAI:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_increase_sat();
+#    endif
+            }
+            return false;
+        case RGB_SAD:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_decrease_sat();
+#    endif
+            }
+            return false;
+        case RGBM_SAD:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_decrease_sat();
+#    endif
+            }
+            return false;
+        case RGB_VAI:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_increase_val();
+#    endif
+            }
+            return false;
+        case RGBM_VAI:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_increase_val();
+#    endif
+            }
+            return false;
+        case RGB_VAD:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_decrease_val();
+#    endif
+            }
+            return false;
+        case RGBM_VAD:
+            // Split keyboards need to trigger on key-up for edge-case issue
+#    ifndef SPLIT_KEYBOARD
+            if (record->event.pressed) {
+#    else
+            if (!record->event.pressed) {
+#    endif
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_decrease_val();
+#    endif
+            }
+            return false;
+        case RGB_SPI:
+            if (record->event.pressed) {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_increase_speed();
+#    endif
+            }
+            return false;
+        case RGBM_SPI:
+            if (record->event.pressed) {
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_increase_speed();
+#    endif
+            }
+            return false;
+        case RGB_SPD:
+            if (record->event.pressed) {
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+                rgblight_decrease_speed();
+#    endif
+            }
+            return false;
+        case RGBM_SPD:
+            if (record->event.pressed) {
+#    if defined(RGB_MATRIX_ENABLE) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
+                rgb_matrix_decrease_speed();
+#    endif
+            }
+            return false;
+#    if defined(RGBLIGHT_ENABLE) && !defined(RGBLIGHT_DISABLE_KEYCODES)
+        case RGB_MODE_PLAIN:
+            if (record->event.pressed) {
+                rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
+            }
+            return false;
+        case RGB_MODE_BREATHE:
+#        ifdef RGBLIGHT_EFFECT_BREATHING
+            if (record->event.pressed) {
+                if ((RGBLIGHT_MODE_BREATHING <= rgblight_get_mode()) && (rgblight_get_mode() < RGBLIGHT_MODE_BREATHING_end)) {
+                    rgblight_step();
+                } else {
+                    rgblight_mode(RGBLIGHT_MODE_BREATHING);
+                }
+            }
+#        endif
+            return false;
+        case RGB_MODE_RAINBOW:
+#        ifdef RGBLIGHT_EFFECT_RAINBOW_MOOD
+            if (record->event.pressed) {
+                if ((RGBLIGHT_MODE_RAINBOW_MOOD <= rgblight_get_mode()) && (rgblight_get_mode() < RGBLIGHT_MODE_RAINBOW_MOOD_end)) {
+                    rgblight_step();
+                } else {
+                    rgblight_mode(RGBLIGHT_MODE_RAINBOW_MOOD);
+                }
+            }
+#        endif
+            return false;
+        case RGB_MODE_SWIRL:
+#        ifdef RGBLIGHT_EFFECT_RAINBOW_SWIRL
+            if (record->event.pressed) {
+                if ((RGBLIGHT_MODE_RAINBOW_SWIRL <= rgblight_get_mode()) && (rgblight_get_mode() < RGBLIGHT_MODE_RAINBOW_SWIRL_end)) {
+                    rgblight_step();
+                } else {
+                    rgblight_mode(RGBLIGHT_MODE_RAINBOW_SWIRL);
+                }
+            }
+#        endif
+            return false;
+        case RGB_MODE_SNAKE:
+#        ifdef RGBLIGHT_EFFECT_SNAKE
+            if (record->event.pressed) {
+                if ((RGBLIGHT_MODE_SNAKE <= rgblight_get_mode()) && (rgblight_get_mode() < RGBLIGHT_MODE_SNAKE_end)) {
+                    rgblight_step();
+                } else {
+                    rgblight_mode(RGBLIGHT_MODE_SNAKE);
+                }
+            }
+#        endif
+            return false;
+        case RGB_MODE_KNIGHT:
+#        ifdef RGBLIGHT_EFFECT_KNIGHT
+            if (record->event.pressed) {
+                if ((RGBLIGHT_MODE_KNIGHT <= rgblight_get_mode()) && (rgblight_get_mode() < RGBLIGHT_MODE_KNIGHT_end)) {
+                    rgblight_step();
+                } else {
+                    rgblight_mode(RGBLIGHT_MODE_KNIGHT);
+                }
+            }
+#        endif
+            return false;
+        case RGB_MODE_XMAS:
+#        ifdef RGBLIGHT_EFFECT_CHRISTMAS
+            if (record->event.pressed) {
+                rgblight_mode(RGBLIGHT_MODE_CHRISTMAS);
+            }
+#        endif
+            return false;
+        case RGB_MODE_GRADIENT:
+#        ifdef RGBLIGHT_EFFECT_STATIC_GRADIENT
+            if (record->event.pressed) {
+                if ((RGBLIGHT_MODE_STATIC_GRADIENT <= rgblight_get_mode()) && (rgblight_get_mode() < RGBLIGHT_MODE_STATIC_GRADIENT_end)) {
+                    rgblight_step();
+                } else {
+                    rgblight_mode(RGBLIGHT_MODE_STATIC_GRADIENT);
+                }
+            }
+#        endif
+            return false;
+        case RGB_MODE_RGBTEST:
+#        ifdef RGBLIGHT_EFFECT_RGB_TEST
+            if (record->event.pressed) {
+                rgblight_mode(RGBLIGHT_MODE_RGB_TEST);
+            }
+#        endif
+            return false;
+#    endif
+#endif  // RGBLIGHT_ENABLE
+
     #ifdef PROTOCOL_LUFA
     case OUT_AUTO:
       if (record->event.pressed) {
@@ -952,10 +1103,6 @@ void matrix_scan_quantum() {
 
   #ifdef RGB_MATRIX_ENABLE
     rgb_matrix_task();
-    if (rgb_matrix_task_counter == 0) {
-      rgb_matrix_update_pwm_buffers();
-    }
-    rgb_matrix_task_counter = ((rgb_matrix_task_counter + 1) % (RGB_MATRIX_SKIP_FRAMES + 1));
   #endif
 
   matrix_scan_kb();

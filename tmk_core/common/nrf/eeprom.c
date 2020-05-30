@@ -6,8 +6,10 @@
 #define FILE_ID 0x1000
 #define RECORD_KEY 0x1001
 
-#undef EEPROM_SIZE //joric
 #define EEPROM_SIZE 36
+#ifndef KEYBOARD_SCAN_INTERVAL
+#    define KEYBOARD_SCAN_INTERVAL 4
+#endif
 
 __ALIGN(4)
 static uint8_t           buffer[EEPROM_SIZE] __attribute__((aligned(4)));
@@ -15,9 +17,9 @@ static bool              fds_inited         = false;
 static volatile bool     fds_update         = false;
 static volatile uint32_t fds_update_counter = 0;
 
-// FDS record update after 200 ms.
+// FDS record update after 500 ms.
 #ifndef FDS_UPDATE_TIMEOUT
-#    define FDS_UPDATE_TIMEOUT 200
+#    define FDS_UPDATE_TIMEOUT 500
 #endif
 
 static fds_record_desc_t  record_desc = {0};
@@ -36,12 +38,7 @@ static void eeprom_write() {
     APP_ERROR_CHECK(rc);
 }
 
-// added from main.c by joric
-#ifndef KEYBOARD_SCAN_INTERVAL
-#    define KEYBOARD_SCAN_INTERVAL 4
-#endif
-
-void eeprom_update(void) {
+void eeprom_update() {
     if (!fds_update) {
         return;
     }
@@ -226,3 +223,84 @@ void eeprom_update_dword(uint32_t *addr, uint32_t value) { eeprom_write_dword(ad
 
 void eeprom_update_block(const void *buf, void *addr, uint32_t len) { eeprom_write_block(buf, addr, len); }
 
+// Dummy eeprom
+
+// #define EEPROM_SIZE 32
+// static uint8_t buffer[EEPROM_SIZE];
+
+// uint8_t eeprom_read_byte(const uint8_t *addr) {
+// 	uintptr_t offset = (uintptr_t)addr;
+// 	return buffer[offset];
+// }
+
+// void eeprom_write_byte(uint8_t *addr, uint8_t value) {
+// 	uintptr_t offset = (uintptr_t)addr;
+// 	buffer[offset] = value;
+// }
+
+// uint16_t eeprom_read_word(const uint16_t *addr) {
+// 	const uint8_t *p = (const uint8_t *)addr;
+// 	return eeprom_read_byte(p) | (eeprom_read_byte(p+1) << 8);
+// }
+
+// uint32_t eeprom_read_dword(const uint32_t *addr) {
+// 	const uint8_t *p = (const uint8_t *)addr;
+// 	return eeprom_read_byte(p) | (eeprom_read_byte(p+1) << 8)
+// 		| (eeprom_read_byte(p+2) << 16) | (eeprom_read_byte(p+3) << 24);
+// }
+
+// void eeprom_read_block(void *buf, const void *addr, uint32_t len) {
+// 	const uint8_t *p = (const uint8_t *)addr;
+// 	uint8_t *dest = (uint8_t *)buf;
+// 	while (len--) {
+// 		*dest++ = eeprom_read_byte(p++);
+// 	}
+// }
+
+// void eeprom_write_word(uint16_t *addr, uint16_t value) {
+// 	uint8_t *p = (uint8_t *)addr;
+// 	eeprom_write_byte(p++, value);
+// 	eeprom_write_byte(p, value >> 8);
+// }
+
+// void eeprom_write_dword(uint32_t *addr, uint32_t value) {
+// 	uint8_t *p = (uint8_t *)addr;
+// 	eeprom_write_byte(p++, value);
+// 	eeprom_write_byte(p++, value >> 8);
+// 	eeprom_write_byte(p++, value >> 16);
+// 	eeprom_write_byte(p, value >> 24);
+// }
+
+// void eeprom_write_block(const void *buf, void *addr, uint32_t len) {
+// 	uint8_t *p = (uint8_t *)addr;
+// 	const uint8_t *src = (const uint8_t *)buf;
+// 	while (len--) {
+// 		eeprom_write_byte(p++, *src++);
+// 	}
+// }
+
+// void eeprom_update_byte(uint8_t *addr, uint8_t value) {
+// 	eeprom_write_byte(addr, value);
+// }
+
+// void eeprom_update_word(uint16_t *addr, uint16_t value) {
+// 	uint8_t *p = (uint8_t *)addr;
+// 	eeprom_write_byte(p++, value);
+// 	eeprom_write_byte(p, value >> 8);
+// }
+
+// void eeprom_update_dword(uint32_t *addr, uint32_t value) {
+// 	uint8_t *p = (uint8_t *)addr;
+// 	eeprom_write_byte(p++, value);
+// 	eeprom_write_byte(p++, value >> 8);
+// 	eeprom_write_byte(p++, value >> 16);
+// 	eeprom_write_byte(p, value >> 24);
+// }
+
+// void eeprom_update_block(const void *buf, void *addr, uint32_t len) {
+// 	uint8_t *p = (uint8_t *)addr;
+// 	const uint8_t *src = (const uint8_t *)buf;
+// 	while (len--) {
+// 		eeprom_write_byte(p++, *src++);
+// 	}
+// }

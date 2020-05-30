@@ -404,6 +404,7 @@ enum quantum_keycodes {
     BL_BRTG,
 
     // RGB functionality
+    // For RGB underglow
     RGB_TOG,
     RGB_MODE_FORWARD,
     RGB_MODE_REVERSE,
@@ -424,6 +425,19 @@ enum quantum_keycodes {
     RGB_MODE_XMAS,
     RGB_MODE_GRADIENT,
     RGB_MODE_RGBTEST,
+
+    // For RGB matrix
+    RGBM_TOG,
+    RGBM_MODE_FORWARD,
+    RGBM_MODE_REVERSE,
+    RGBM_HUI,
+    RGBM_HUD,
+    RGBM_SAI,
+    RGBM_SAD,
+    RGBM_VAI,
+    RGBM_VAD,
+    RGBM_SPI,
+    RGBM_SPD,
 
     // Left shift, open paren
     KC_LSPO,
@@ -578,6 +592,9 @@ enum quantum_keycodes {
 #define RGB_MOD RGB_MODE_FORWARD
 #define RGB_SMOD RGB_MODE_FORWARD
 #define RGB_RMOD RGB_MODE_REVERSE
+
+#define RGBM_MOD RGBM_MODE_FORWARD
+#define RGBM_RMOD RGBM_MODE_REVERSE
 
 #define RGB_M_P RGB_MODE_PLAIN
 #define RGB_M_B RGB_MODE_BREATHE

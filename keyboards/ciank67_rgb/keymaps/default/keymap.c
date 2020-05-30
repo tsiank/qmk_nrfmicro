@@ -71,7 +71,9 @@ enum custom_keycodes {
     KANA,
     RGBRST,
     PLOVER,
-    EXT_PLV
+    EXT_PLV,
+   RM_TOG,
+  RGBMRST
 };
 
 
@@ -157,10 +159,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 [_RAISE] = LAYOUT(\
         USB_EN,   USB_DIS, _______,  _______,    _______,    _______,  _______, _______, KC_PSCREEN, KC_SCROLLLOCK, KC_PAUSE, _______,_______, RESET,
-        _______,    _______,    _______,    _______,    _______   , _______,   _______, _______, KC_INSERT, KC_HOME, KC_PGUP, _______,_______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_DELETE, KC_END,KC_PGDOWN,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,_______, AD_WO_L,BLE_EN,DELBNDS,
-        RGBRST, _______, _______, KC_TRNS,              KC_SPC, KC_TRNS,RGB_TOG, RGB_MOD, _______, ADV_ID0, ADV_ID1, ADV_ID2
+        RGBMRST,    _______,    _______,    _______,    _______   , _______,   _______, _______, KC_INSERT, KC_HOME, KC_PGUP, _______,_______, _______,
+       RM_TOG,  RGBM_MOD,RGBM_RMOD,_______, _______, _______, _______, _______, _______, _______, KC_DELETE, KC_END,KC_PGDOWN,
+       RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_K, RGB_M_X, RGB_M_G, RGB_M_T,  _______,_______, AD_WO_L,BLE_EN,DELBNDS,
+        RGB_TOG, RGBRST, RGB_MOD,  RGB_RMOD, KC_SPC, KC_TRNS,_______, _______, _______, _______, ADV_ID1, ADV_ID2
 ),
 
 [_ADJUST] = LAYOUT(\
@@ -232,7 +234,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif
 
   switch (keycode) {
-        case RGB_TOG:
+        case RM_TOG:
             if (record->event.pressed) {
                 if (rgb_matrix_config.enable) {
                     i2c_stop();
@@ -308,7 +310,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (record->event.pressed) {
           rgblight_mode(RGB_current_mode);
           rgblight_step();
-          RGB_current_mode = rgb_matrix_config.mode;
+          RGB_current_mode = rgblight_config.mode;
           NRF_LOG_INFO("RGB_MOD, RGB_current_mode: %d\n", RGB_current_mode);
         }
       #endif
@@ -349,11 +351,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           NRF_LOG_INFO("RGBRST, RGB_current_mode: %d\n", RGB_current_mode);
         }
       #endif
+      
+      #ifdef SSD1306OLED
+      //iota_gfx_init(!IS_LEFT_HAND); // enable the OLED screen
+      #endif
 
+      break;
+    case RGBMRST:
       #ifdef RGB_MATRIX_ENABLE
         if (record->event.pressed) {
           nrfmicro_power_enable(true);
-          eeconfig_update_rgb_matrix_default();
+           eeconfig_update_rgb_matrix_default();
           rgb_matrix_enable();
           RGB_current_mode = rgb_matrix_config.mode;
           NRF_LOG_INFO("RGBRST, RGB_current_mode: %d\n", RGB_current_mode);

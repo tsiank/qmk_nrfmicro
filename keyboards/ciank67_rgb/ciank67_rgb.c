@@ -139,7 +139,7 @@ void matrix_scan_user(void) {
 }
 
 
-
+#ifdef RGB_MATRIX_ENABLE
 const is31_led g_is31_leds[DRIVER_LED_TOTAL] = {
  /* Refer to IS31 manual for these locations
  *   driver
@@ -265,3 +265,4 @@ led_config_t g_led_config = {{
     2,                            2,
         2, 2, 2, 2,2, 2, 2
 }};
+#endif

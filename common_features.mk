@@ -103,24 +103,88 @@ ifeq ($(strip $(UNICODE_COMMON)), yes)
 endif
 
 ifeq ($(strip $(RGBLIGHT_ENABLE)), yes)
+    POST_CONFIG_H += $(QUANTUM_DIR)/rgblight_post_config.h
     OPT_DEFS += -DRGBLIGHT_ENABLE
+    SRC += $(QUANTUM_DIR)/color.c
     SRC += $(QUANTUM_DIR)/rgblight.c
     CIE1931_CURVE = yes
     LED_BREATHING_TABLE = yes
     ifeq ($(strip $(RGBLIGHT_CUSTOM_DRIVER)), yes)
         OPT_DEFS += -DRGBLIGHT_CUSTOM_DRIVER
     else
-	    SRC += ws2812.c
+        SRC += ws2812.c
     endif
 endif
 
-ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
+VALID_MATRIX_TYPES := yes IS31FL3731 IS31FL3733 IS31FL3737 WS2812 custom
+
+LED_MATRIX_ENABLE ?= no
+ifneq ($(strip $(LED_MATRIX_ENABLE)), no)
+    ifeq ($(filter $(LED_MATRIX_ENABLE),$(VALID_MATRIX_TYPES)),)
+        $(error LED_MATRIX_ENABLE="$(LED_MATRIX_ENABLE)" is not a valid matrix type)
+    else
+        OPT_DEFS += -DLED_MATRIX_ENABLE -DBACKLIGHT_ENABLE -DBACKLIGHT_CUSTOM_DRIVER
+        SRC += $(QUANTUM_DIR)/led_matrix.c
+        SRC += $(QUANTUM_DIR)/led_matrix_drivers.c
+    endif
+endif
+
+ifeq ($(strip $(LED_MATRIX_ENABLE)), IS31FL3731)
+    OPT_DEFS += -DIS31FL3731
+    COMMON_VPATH += $(DRIVER_PATH)/issi
+    SRC += is31fl3731-simple.c
+    QUANTUM_LIB_SRC += i2c_master.c
+endif
+
+RGB_MATRIX_ENABLE ?= no
+
+ifneq ($(strip $(RGB_MATRIX_ENABLE)), no)
+ifeq ($(filter $(RGB_MATRIX_ENABLE),$(VALID_MATRIX_TYPES)),)
+    $(error RGB_MATRIX_ENABLE="$(RGB_MATRIX_ENABLE)" is not a valid matrix type)
+endif
     OPT_DEFS += -DRGB_MATRIX_ENABLE
-    SRC += is31fl3731.c
-    SRC += i2c_master.c
     SRC += $(QUANTUM_DIR)/color.c
     SRC += $(QUANTUM_DIR)/rgb_matrix.c
+    SRC += $(QUANTUM_DIR)/rgb_matrix_drivers.c
     CIE1931_CURVE = yes
+endif
+
+ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
+	RGB_MATRIX_ENABLE = IS31FL3731
+endif
+
+ifeq ($(strip $(RGB_MATRIX_ENABLE)), IS31FL3731)
+    OPT_DEFS += -DIS31FL3731 -DSTM32_I2C -DHAL_USE_I2C=TRUE
+    COMMON_VPATH += $(DRIVER_PATH)/issi
+    SRC += is31fl3731.c
+    QUANTUM_LIB_SRC += i2c_master.c
+endif
+
+ifeq ($(strip $(RGB_MATRIX_ENABLE)), IS31FL3733)
+    OPT_DEFS += -DIS31FL3733 -DSTM32_I2C -DHAL_USE_I2C=TRUE
+    COMMON_VPATH += $(DRIVER_PATH)/issi
+    SRC += is31fl3733.c
+    QUANTUM_LIB_SRC += i2c_master.c
+endif
+
+ifeq ($(strip $(RGB_MATRIX_ENABLE)), IS31FL3737)
+    OPT_DEFS += -DIS31FL3737 -DSTM32_I2C -DHAL_USE_I2C=TRUE
+    COMMON_VPATH += $(DRIVER_PATH)/issi
+    SRC += is31fl3737.c
+    QUANTUM_LIB_SRC += i2c_master.c
+endif
+
+ifeq ($(strip $(RGB_MATRIX_ENABLE)), WS2812)
+    OPT_DEFS += -DWS2812
+    SRC += ws2812.c
+endif
+
+ifeq ($(strip $(RGB_MATRIX_CUSTOM_KB)), yes)
+    OPT_DEFS += -DRGB_MATRIX_CUSTOM_KB
+endif
+
+ifeq ($(strip $(RGB_MATRIX_CUSTOM_USER)), yes)
+    OPT_DEFS += -DRGB_MATRIX_CUSTOM_USER
 endif
 
 ifeq ($(strip $(TAP_DANCE_ENABLE)), yes)

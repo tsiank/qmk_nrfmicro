@@ -27,7 +27,7 @@
 //#include "i2cmaster.h"
 
 #include <stdint.h>
-#include "rgblight_types.h"
+#include "color.h"
 #undef PACKED
 
 

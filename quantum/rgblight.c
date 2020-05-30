@@ -35,10 +35,7 @@
 #ifdef VELOCIKEY_ENABLE
 #    include "velocikey.h"
 #endif
-
-#ifdef PROTOCOL_NRF
-#include "eeprom.h"
-#endif
+#    include "eeprom.h"
 
 #ifdef RGBLIGHT_SPLIT
 /* for split keyboard */
@@ -195,14 +192,14 @@ void rgblight_init(void) {
     dprintf("rgblight_init start!\n");
     if (!eeconfig_is_enabled()) {
         dprintf("rgblight_init eeconfig is not enabled.\n");
-//        eeconfig_init();
-//        eeconfig_update_rgblight_default();
+        eeconfig_init();
+        eeconfig_update_rgblight_default();
     }
     rgblight_config.raw = eeconfig_read_rgblight();
     RGBLIGHT_SPLIT_SET_CHANGE_MODEHSVS;
     if (!rgblight_config.mode) {
         dprintf("rgblight_init rgblight_config.mode = 0. Write default values to EEPROM.\n");
-//        eeconfig_update_rgblight_default();
+        eeconfig_update_rgblight_default();
         rgblight_config.raw = eeconfig_read_rgblight();
     }
     rgblight_check_config();
@@ -636,10 +633,7 @@ void rgblight_update_sync(rgblight_syncinfo_t *syncinfo, bool write_to_eeprom) {
             rgblight_config.enable = 1;  // == rgblight_enable_noeeprom();
             rgblight_mode_eeprom_helper(syncinfo->config.mode, write_to_eeprom);
         } else {
-            //rgblight_disable_noeeprom();
-            // super weird. i want to write to eeprom on turning off as well // joric
-            rgblight_disable(); // joric
-            rgblight_mode_eeprom_helper(syncinfo->config.mode, write_to_eeprom); // joric
+            rgblight_disable_noeeprom();
         }
     }
     if (syncinfo->status.change_flags & RGBLIGHT_STATUS_CHANGE_HSVS) {
@@ -1061,6 +1055,3 @@ void rgblight_effect_alternating(animation_status_t *anim) {
     anim->pos = (anim->pos + 1) % 2;
 }
 #endif
-
-#include "color.c"
-
